@@ -102,59 +102,97 @@ export default function App() {
   return (
     <div className="min-h-screen flex bg-slate-50 text-slate-800 antialiased font-sans">
       {/* 1. Left Sidebar - Premium Dark Navy Theme */}
-      <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between shrink-0 border-r border-slate-800 shadow-xl z-20">
-        <div className="p-6">
-          {/* Logo Brand Header */}
-          <div className="flex items-center gap-3 mb-8">
-            <div className="p-2.5 bg-gradient-to-tr from-indigo-600 to-indigo-400 text-white rounded-2xl shadow-lg shadow-indigo-500/20">
-              <Wallet className="w-6 h-6" />
-            </div>
-            <div>
-              <h1 className="text-xl font-black text-white tracking-tight">SpendWise</h1>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">MERN Tracker</p>
-            </div>
-          </div>
+      {/* Sidebar */}
+<aside className="w-[220px] bg-[#0f1117] flex flex-col shrink-0 border-r border-[#1e2432]">
+  
+  {/* Top section */}
+  <div className="px-4 pt-6">
+    
+    {/* Logo */}
+    <div className="flex items-center gap-2.5 px-1 mb-7">
+      <div className="w-7 h-7 bg-[#1a1f2e] border border-[#2a3040] rounded-[6px] flex items-center justify-center shrink-0">
+        <Wallet className="w-3.5 h-3.5 text-[#6c7a99] stroke-[1.75]" />
+      </div>
+      <div>
+        <p className="text-[13px] font-semibold text-[#e2e8f0] tracking-[-0.01em]">SpendWise</p>
+        <p className="text-[10px] text-[#3d4a63] mt-px tracking-[0.04em]">Expense Tracker</p>
+      </div>
+    </div>
 
-          {/* Navigation Links */}
-          <nav className="space-y-1.5">
-            <button
-              onClick={() => setCurrentPage('dashboard')}
-              className={`w-full flex items-center gap-3.5 px-4.5 py-3 rounded-2xl font-semibold text-sm transition-all duration-200 outline-none ${
-                currentPage === 'dashboard'
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/10'
-                  : 'hover:bg-slate-800 hover:text-white text-slate-400'
+    {/* Nav label */}
+    <p className="text-[10px] font-medium text-[#2e3a52] uppercase tracking-[0.08em] px-2 mb-1.5">
+      Menu
+    </p>
+
+    {/* Nav items */}
+    <nav className="flex flex-col gap-0.5">
+      {[
+        { id: 'dashboard', label: 'Dashboard',  Icon: LayoutDashboard },
+        { id: 'analytics', label: 'Analytics',  Icon: BarChart3       },
+      ].map(({ id, label, Icon }) => {
+        const active = currentPage === id;
+        return (
+          <button
+            key={id}
+            onClick={() => setCurrentPage(id)}
+            className={`
+              w-full flex items-center gap-2.5 px-2 py-[7px] rounded-[6px]
+              border transition-colors duration-150 outline-none text-left
+              ${active
+                ? 'bg-[#161b27] border-[#1e2a3f]'
+                : 'border-transparent hover:bg-[#161b27]'
+              }
+            `}
+          >
+            <Icon
+              className={`w-4 h-4 shrink-0 stroke-[1.75] ${
+                active ? 'text-[#7c8fba]' : 'text-[#3d4a63]'
+              }`}
+            />
+            <span
+              className={`text-[13px] flex-1 ${
+                active ? 'text-[#c8d3ea] font-medium' : 'text-[#3d4a63] font-normal'
               }`}
             >
-              <LayoutDashboard className="w-5 h-5" />
-              <span>Dashboard</span>
-            </button>
-            <button
-              onClick={() => setCurrentPage('analytics')}
-              className={`w-full flex items-center gap-3.5 px-4.5 py-3 rounded-2xl font-semibold text-sm transition-all duration-200 outline-none ${
-                currentPage === 'analytics'
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/10'
-                  : 'hover:bg-slate-800 hover:text-white text-slate-400'
-              }`}
-            >
-              <BarChart3 className="w-5 h-5" />
-              <span>Analytics Insights</span>
-            </button>
-          </nav>
-        </div>
+              {label}
+            </span>
+            {active && (
+              <span className="w-0.5 h-3.5 bg-[#3d5080] rounded-full shrink-0" />
+            )}
+          </button>
+        );
+      })}
+    </nav>
+  </div>
 
-        {/* Database connectivity status inside Sidebar */}
-        <div className="p-6 border-t border-slate-800">
-          <div className="flex items-center gap-2.5 px-3 py-2 bg-slate-950/40 rounded-xl border border-slate-800/60">
-            <div className={`w-2 h-2 rounded-full shrink-0 ${dbOffline ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'}`} />
-            <div className="truncate">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Local MongoDB</p>
-              <p className="text-xs font-semibold text-slate-300 truncate mt-0.5">
-                {dbOffline ? 'Offline / Offline' : 'Active (27017)'}
-              </p>
-            </div>
-          </div>
-        </div>
-      </aside>
+  {/* Spacer */}
+  <div className="flex-1" />
+
+  {/* DB status footer */}
+  <div className="px-4 pb-4 border-t border-[#161b27] pt-3.5">
+    <div className="flex items-center gap-2 px-2.5 py-2 bg-[#0a0d14] border border-[#161b27] rounded-[6px]">
+      <span className="relative flex shrink-0">
+        <span
+          className={`w-1.5 h-1.5 rounded-full ${
+            dbOffline ? 'bg-[#5c1e1e]' : 'bg-[#1a6b3a]'
+          }`}
+        />
+        {!dbOffline && (
+          <span className="absolute inset-0 rounded-full border border-[#1a6b3a] opacity-40 scale-[2]" />
+        )}
+      </span>
+      <div className="min-w-0">
+        <p className="text-[10px] text-[#2e3a52] tracking-[0.04em]">MongoDB</p>
+        <p className={`text-[11px] font-medium mt-px truncate ${
+          dbOffline ? 'text-[#5c1e1e]' : 'text-[#1a6b3a]'
+        }`}>
+          {dbOffline ? 'Disconnected' : 'localhost:27017'}
+        </p>
+      </div>
+    </div>
+  </div>
+
+</aside>
 
       {/* 2. Main Content Area */}
       <main className="flex-1 flex flex-col h-screen overflow-y-auto z-10 relative">
