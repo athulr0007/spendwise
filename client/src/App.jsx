@@ -99,6 +99,57 @@ export default function App() {
     setIsFormOpen(true);
   };
 
+  const buildDownloadFileName = () => {
+    const parts = ['expenses'];
+
+    if (filters.category) {
+      parts.push(filters.category.toLowerCase());
+    }
+    if (filters.title) {
+      parts.push('search');
+    }
+    if (filters.from || filters.to) {
+      const fromPart = filters.from ? filters.from : 'start';
+      const toPart = filters.to ? filters.to : 'end';
+      parts.push(`${fromPart}_to_${toPart}`);
+    }
+
+    if (parts.length === 1) {
+      parts.push(activeMonth || new Date().toISOString().slice(0, 7));
+    }
+
+    return `${parts.join('_')}.xlsx`;
+  };
+
+  // Handle Excel download with filters
+  const handleDownloadExcel = async () => {
+    try {
+      const params = new URLSearchParams();
+      if (filters.category) params.append('category', filters.category);
+      if (filters.from) params.append('from', filters.from);
+      if (filters.to) params.append('to', filters.to);
+      if (filters.title) params.append('title', filters.title);
+      
+      const queryString = params.toString() ? `?${params.toString()}` : '';
+      console.log('Download filters:', { filters, queryString });
+      const response = await fetch(`http://localhost:5000/api/expenses/download/excel${queryString}`);
+      if (!response.ok) throw new Error('Download failed');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = buildDownloadFileName();
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Error downloading Excel:', error);
+      addToast('Failed to download Excel file', 'error');
+    }
+  };
+
   return (
     <div className="min-h-screen flex bg-slate-50 text-slate-800 antialiased font-sans">
       {/* 1. Left Sidebar - Premium Dark Navy Theme */}
@@ -263,6 +314,7 @@ export default function App() {
                 filters={filters}
                 updateFilters={updateFilters}
                 clearFilters={clearFilters}
+                onDownloadExcel={handleDownloadExcel}
               />
 
               {/* Expense List Table */}

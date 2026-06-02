@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Calendar, SlidersHorizontal, X } from 'lucide-react';
+import { Search, Calendar, SlidersHorizontal, X, Download } from 'lucide-react';
 import { formatDate } from '../utils/dateUtils';
 
-export const Filters = ({ filters, updateFilters, clearFilters }) => {
+export const Filters = ({ filters, updateFilters, clearFilters, onDownloadExcel }) => {
   const [localTitle, setLocalTitle] = useState(filters.title);
 
   // Sync local title input value with filter changes (like clear)
@@ -26,9 +26,18 @@ export const Filters = ({ filters, updateFilters, clearFilters }) => {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 mb-6 transition-all duration-300 hover:shadow-md animate-fade-in-up">
-      <div className="flex items-center gap-2 mb-4">
-        <SlidersHorizontal className="w-5 h-5 text-slate-500" />
-        <h3 className="font-semibold text-slate-700">Filter Expenses</h3>
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex items-center gap-2">
+          <SlidersHorizontal className="w-5 h-5 text-slate-500" />
+          <h3 className="font-semibold text-slate-700">Filter Expenses</h3>
+        </div>
+        <button
+          onClick={onDownloadExcel}
+          className="flex items-center gap-2 px-3 py-2 bg-indigo-600 text-white font-semibold text-xs rounded-lg hover:bg-indigo-700 transition-all duration-200 shadow-lg shadow-indigo-600/20 hover:shadow-lg hover:shadow-indigo-700/30 whitespace-nowrap"
+        >
+          <Download className="w-4 h-4" />
+          <span>Download</span>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

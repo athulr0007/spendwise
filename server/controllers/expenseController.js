@@ -300,6 +300,153 @@ const getTrendsSummary = async (req, res, next) => {
   }
 };
 
+// 8. GET /api/expenses/download/excel - Download filtered expenses as Excel file
+const downloadExpensesExcel = async (req, res, next) => {
+  try {
+    const ExcelJS = require('exceljs');
+    const { category, from, to, title } = req.query;
+
+    console.log('Download request received with query:', { category, from, to, title }); // Debug log
+
+    // Build query filters (same as getExpenses)
+    const query = {};
+
+    // Filter by category
+    if (category) {
+      query.category = category;
+    }
+
+    // Filter by partial title search
+    if (title) {
+      const sanitized = escapeRegex(title.trim());
+      query.title = { $regex: sanitized, $options: 'i' };
+    }
+
+    // Filter by date range (from/to)
+    if (from || to) {
+      let start = from ? new Date(from) : null;
+      let end = to ? new Date(to) : null;
+
+      // Automatically swap if start date is after end date
+      if (start && end && start > end) {
+        [start, end] = [end, start];
+      }
+
+      query.date = {};
+      if (start) {
+        query.date.$gte = start;
+      }
+      if (end) {
+        // Set end to the very end of that day (23:59:59.999) to cover the full day
+        const endOfDay = new Date(end);
+        endOfDay.setHours(23, 59, 59, 999);
+        query.date.$lte = endOfDay;
+      }
+    }
+
+    // Fetch filtered expenses sorted by date
+    const expenses = await Expense.find(query).sort({ date: -1 });
+
+    console.log('Query:', query, 'Found expenses:', expenses.length); // Debug log
+
+    // Create a new workbook and worksheet
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Expenses');
+
+    // Define columns
+    worksheet.columns = [
+      { header: 'Date', key: 'date', width: 12 },
+      { header: 'Title', key: 'title', width: 25 },
+      { header: 'Category', key: 'category', width: 15 },
+      { header: 'Amount (₹)', key: 'amount', width: 12 },
+      { header: 'Note', key: 'note', width: 30 }
+    ];
+
+    // Style header row
+    worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    worksheet.getRow(1).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF1F2937' } // Dark gray
+    };
+    worksheet.getRow(1).alignment = { horizontal: 'center', vertical: 'middle' };
+
+    // Add data rows
+    expenses.forEach((expense) => {
+      const row = worksheet.addRow({
+        date: new Date(expense.date).toLocaleDateString('en-IN'),
+        title: expense.title,
+        category: expense.category,
+        amount: expense.amount,
+        note: expense.note || ''
+      });
+
+      // Alternate row colors
+      if (worksheet.lastRow.number % 2 === 0) {
+        row.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFF3F4F6' } // Light gray
+        };
+      }
+
+      // Right align amount column
+      row.getCell('amount').alignment = { horizontal: 'right' };
+    });
+
+    // Add totals row at the end
+    const totalAmount = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+    const totalRow = worksheet.addRow({
+      date: '',
+      title: 'TOTAL',
+      category: '',
+      amount: totalAmount,
+      note: ''
+    });
+
+    totalRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    totalRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF374151' } // Darker gray
+    };
+    totalRow.getCell('amount').alignment = { horizontal: 'right' };
+
+    const buildDownloadFileName = () => {
+      const nameParts = ['expenses'];
+      if (category) nameParts.push(category.toLowerCase());
+      if (title) nameParts.push('search');
+      if (from || to) {
+        const fromPart = from ? from : 'start';
+        const toPart = to ? to : 'end';
+        nameParts.push(`${fromPart}_to_${toPart}`);
+      }
+      if (nameParts.length === 1) {
+        nameParts.push(new Date().toISOString().slice(0, 7));
+      }
+      return `${nameParts.join('_')}.xlsx`;
+    };
+
+    const fileName = buildDownloadFileName();
+
+    // Set response headers for file download
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${fileName}"`
+    );
+
+    // Write workbook to response
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getExpenses,
   getExpenseById,
@@ -307,5 +454,6 @@ module.exports = {
   updateExpense,
   deleteExpense,
   getMonthlySummary,
-  getTrendsSummary
+  getTrendsSummary,
+  downloadExpensesExcel
 };

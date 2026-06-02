@@ -7,9 +7,13 @@ const {
   updateExpense,
   deleteExpense,
   getMonthlySummary,
-  getTrendsSummary
+  getTrendsSummary,
+  downloadExpensesExcel
 } = require('../controllers/expenseController');
 const { expenseValidationRules, validate } = require('../middleware/validate');
+
+// Download route (must come before other routes)
+router.get('/download/excel', downloadExpensesExcel);
 
 // Aggregation summary routes (must come BEFORE /:id to prevent routing clashes)
 router.get('/summary/monthly', getMonthlySummary);
