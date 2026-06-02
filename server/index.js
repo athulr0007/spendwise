@@ -65,7 +65,9 @@ app.use((req, res, next) => {
 
 // API Routes
 const expenseRoutes = require('./routes/expenses');
+const assistantRoutes = require('./routes/assistant');
 app.use('/api/expenses', expenseRoutes);
+app.use('/api/assistant', assistantRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

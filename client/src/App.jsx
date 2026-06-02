@@ -6,6 +6,7 @@ import { Analytics } from './pages/Analytics';
 import { Filters } from './components/Filters';
 import { ExpenseList } from './components/ExpenseList';
 import { ExpenseForm } from './components/ExpenseForm';
+import { ChatAssistant } from './components/ChatAssistant';
 import {
   Wallet,
   LayoutDashboard,
@@ -339,6 +340,8 @@ export default function App() {
           )}
         </div>
       </main>
+
+      <ChatAssistant />
 
       {/* 3. Action Add/Edit Modal Overlay */}
       <ExpenseForm
