@@ -2,6 +2,18 @@
 
 SpendWise is a local-first single-user personal expense tracker built using the MERN (MongoDB, Express, React, Node) stack. It is designed to run entirely locally with zero external dependencies, providing instant, beautiful insights and summaries of your monthly budgets.
 
+This project was built to deliver a fast, self-hosted budgeting tool that keeps your financial data on your machine while still offering advanced analytics, filtered exports, and interactive assistance.
+
+Key additions include an Excel export for filtered expense reports and a small AI-powered chat assistant that can answer questions directly from the user's local expense history.
+
+## What this project delivers
+
+- A local-first expense tracker with a modern dashboard and monthly insights
+- Advanced filters with category, date range, and keyword search
+- An Excel export function for filtered expense data
+- A Groq-powered chat assistant that understands your stored expense records and answers questions naturally
+- A self-hosted architecture with no required cloud backend for data privacy
+
 ---
 
 ## 1. How to Run It
@@ -27,6 +39,15 @@ Ensure your `.env` contains:
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/spendwise
 ```
+
+To enable the budget chat assistant, also add:
+```env
+GROQ_API=
+GROQ_API_URL=https://api.groq.ai/v1/outputs
+GROQ_MODEL=llama-3.1-8b-instant
+```
+
+If the assistant cannot resolve `api.groq.ai`, set `GROQ_API_URL` explicitly and restart the server.
 
 ### Seed Analytical Data
 Populate 6 months of realistic sample data so that all trend lines, category stacks, averages, and statistics cards render rich charts immediately:
@@ -67,6 +88,8 @@ Visit **`http://localhost:5173`** in your browser.
 - **Optimistic UI updates:** Immediate CRUD state modifications on the client with automated cached rollbacks if REST requests fail.
 - **Stat Cards & Charts:** Visual rendering of Donut breakdowns (custom center total label), Daily Spend bar charts (showing zero-height bars for quiet days), and rolling 6-month line and stacked bar charts.
 - **Interactive Legend:** Custom legends allowing users to toggle visible categories dynamically across multiple analytics charts simultaneously.
+- **Export to Excel:** Download filtered expense data directly from the filter panel as an `.xlsx` report.
+- **Budget Chat Assistant:** In-app assistant powered by Groq LLM that reads your local expense records and answers questions like “how much did I spend on transport this week?”.
 - **MongoDB Status Guard:** Server stays online and serves 503 errors if local MongoDB is offline, triggering a warning banner on the client instead of throwing CastErrors.
 
 ### ⚠️ Partial
@@ -74,7 +97,7 @@ Visit **`http://localhost:5173`** in your browser.
 
 ### ❌ Skipped
 - **Authentication:** Multi-user support is omitted to satisfy local-first specifications.
-- **Cloud Deployment:** Designed to be evaluated entirely as a local development server.
+
 
 ---
 
@@ -83,3 +106,4 @@ Visit **`http://localhost:5173`** in your browser.
 - **Search Debouncing:** Keyword searches are debounced by 350ms to save API network bandwidth, resulting in a slight delay before the table updates as the user types.
 - **Amount Floats:** Stored as floating numbers. We handle Indian Rupee currency representation with `.toLocaleString()` / `Intl.NumberFormat` on the UI layer.
 - **Date Inputs:** Native HTML calendar picker is utilized for speed. High-end date-range packages (like React-Day-Picker) were skipped to conserve bundle sizes.
+- **Chat Assistant Connectivity:** The assistant depends on the Groq API. If `api.groq.ai` cannot be resolved or `GROQ_API_URL` is not configured correctly, the chat widget will return a 502 and will not respond.
