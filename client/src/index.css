@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-800 font-sans antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+}
+
+/* Custom scrollbars for a premium desktop feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 rounded-full hover:bg-slate-400 transition-colors;
+}
+
+/* Micro-animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Category indicator colors */
+.bg-category-food { @apply bg-emerald-500; }
+.bg-category-transport { @apply bg-sky-500; }
+.bg-category-shopping { @apply bg-purple-500; }
+.bg-category-bills { @apply bg-amber-500; }
+.bg-category-entertainment { @apply bg-pink-500; }
+.bg-category-other { @apply bg-slate-500; }
+
+.text-category-food { @apply text-emerald-600; }
+.text-category-transport { @apply text-sky-600; }
+.text-category-shopping { @apply text-purple-600; }
+.text-category-bills { @apply text-amber-600; }
+.text-category-entertainment { @apply text-pink-600; }
+.text-category-other { @apply text-slate-600; }
